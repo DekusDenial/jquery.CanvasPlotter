@@ -1,0 +1,29 @@
+{
+  "name": "jquery.CanvasPlotter",
+  "title": "jQuery Canvasplotter",
+  "description": "To plot data using HTML5 Canvas element",
+  "version": "0.1.0",
+  "homepage": "https://github.com/DekusDenial/jquery.CanvasPlotter",
+  "author": {
+    "name": "DekusDenial",
+    "email": "dekusdenial@hotmail.com",
+    "url": "http://dekusdenial.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DekusDenial/jquery.CanvasPlotter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DekusDenial/jquery.CanvasPlotter/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/DekusDenial/jquery.CanvasPlotter/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~1.7"
+  },
+  "keywords": []
+}
