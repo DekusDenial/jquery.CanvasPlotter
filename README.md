@@ -14,9 +14,7 @@ In your web page:
 <script src="jquery.js"></script>
 <script src="dist/jquery.CanvasPlotter.min.js"></script>
 <script>
-jQuery(function($) {
-  $.awesome(); // "awesome"
-});
+// coming soon
 </script>
 ```
 
