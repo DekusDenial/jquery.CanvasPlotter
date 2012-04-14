@@ -25,22 +25,38 @@ if ( typeof Object.create !== 'function' ) {
       this.$el = $(el);
 
       this.config = $.extend( {}, $.fn.canvasPlotter.defaults, opts );
+      this.dataSource = this.$el.data('source') || this.config.dataSource;
+      this.dataSource = (this.dataSource.indexOf('#') > -1) ? this.dataSource : ('#' + this.dataSource);
+      this.fetchData();
+    },
+
+    fetchData : function() {
+      // read input data
+      // 1) assume we have a table selector passed in
+      this.xValue = [];
+      this.yValue = [];
+      this.XLabel = this.YLabel = null;
+      var me = this;
+
+      $(this.config.dataSource + ' tr td').each(function(i, el){
+
+        (i & 1) ? me.yValue.push(el.innerText) : me.xValue.push(el.innerText);
+      });
       this.prepareCanvas();
+
     },
 
     prepareCanvas : function(){
       // preset the canvas or adjust according to config
-      var $cv = $('<canvas>');
+      this.$cv = this.$el.append('<canvas>').find('canvas');
       if (this.config.animated) {
-        $cv.addClass('bar-animated');
+        this.$cv.addClass('bar-animated');
       }
 
-      this.$el.append($cv);
+      this.$cv.height = this.config.canvasHeight;
+      this.$cv.width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
+      
 
-    },
-
-    fetchData : function() {
-      // read input data, or fetch by AJAX
     },
 
     normalizeData : function() {
@@ -48,7 +64,7 @@ if ( typeof Object.create !== 'function' ) {
     },
 
     drawLabels : function() {
-      // draw out XLabels and YLabels
+      // draw out XLabel and YLabel
     },
 
     plotBars : function(){
@@ -67,6 +83,7 @@ if ( typeof Object.create !== 'function' ) {
       posY : function(index){
         // calculate the top y position of each bar
       }
+
     }
   };
 
@@ -79,8 +96,13 @@ if ( typeof Object.create !== 'function' ) {
   };
 
   $.fn.canvasPlotter.defaults = {
-    // default settings here
+    // default settings here:
+    // barGap = how much space between each plotted bar
+    // barWidth = how wide is each bar
+    // canvasHeight = how long the canvas should be
+    // dataSource = the source of the data
     animated : false,
+    dataSource: 'table#dataSource',
     barGap : 15,
     barWidth : 20,
     canvasHeight : 200
