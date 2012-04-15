@@ -69,17 +69,16 @@ if ( typeof Object.create !== 'function' ) {
     },
 
     drawLabels : function() {
-
       var ctx = this.cvContext;
+
       ctx.save();
       ctx.fillStyle = '#fff';
       ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, 0, this.$cv[0].width, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
-      ctx.restore();
 
       // draw out XLabel and YLabel
      
       var i, l = this.xValue.length;
-      ctx.save();
+
       ctx.font = "11px Helvetica, Arial, sans-serif";
       ctx.fillStyle = "#000000";
       // first draw x-axis
@@ -95,12 +94,7 @@ if ( typeof Object.create !== 'function' ) {
         this.drawGrids(ctx, this.config.constants.xTickOffset, this.utils.posY.call(this, yTickValue) + Math.round(this.config.constants.yTickOffset / 2));
       }
       
-      // then draw the bottom border of the grid
-      ctx.fillStyle = "#111";
-      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2), this.$cv[0].width, 1);
-      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, 0, 1, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
       ctx.restore();
-
     },
 
     drawGrids : function(ctx, x, y){
@@ -108,6 +102,11 @@ if ( typeof Object.create !== 'function' ) {
       ctx.save();
       ctx.fillStyle = "#ccc";
       ctx.fillRect(x + 20, y, this.$cv[0].width, 1);
+
+      // then draw the bottom border of the grid
+      ctx.fillStyle = "#111";
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2), this.$cv[0].width, 1);
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, 0, 1, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
       ctx.restore();
     },
 
