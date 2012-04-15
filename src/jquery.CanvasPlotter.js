@@ -35,11 +35,12 @@ if ( typeof Object.create !== 'function' ) {
       // 1) assume we have a table selector passed in
       this.xValue = [];
       this.yValue = [];
-      this.XLabel = this.YLabel = null;
       var me = this;
+      var $dataSource = $(this.config.dataSource), $th = $dataSource.find('th');
+      this.XLabel = $th[0];
+      this.YLabel = $th[1];
 
-      $(this.config.dataSource + ' tr td').each(function(i, el){
-
+      $dataSource.find('tr td').each(function(i, el){
         (i & 1) ? me.yValue.push(el.innerText) : me.xValue.push(el.innerText);
       });
       this.prepareCanvas();
@@ -53,9 +54,8 @@ if ( typeof Object.create !== 'function' ) {
         this.$cv.addClass('bar-animated');
       }
 
-      this.$cv.height = this.config.canvasHeight;
-      this.$cv.width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
-      
+      this.$cv[0].height = this.config.canvasHeight;
+      this.$cv[0].width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
 
     },
 

@@ -54,4 +54,12 @@
     strictEqual(cv.className, 'bar-animated', 'should have class "bar-animated" assigned');
   });
 
+  test('should have the right width on canvas', 1, function(){
+    this.elems.canvasPlotter({
+      
+    });
+    var cv = this.elems.find('canvas')[0];
+    strictEqual(cv.width, 470, 'should be 470 pixels wide for 13 bars');
+  });
+
 }(jQuery));
