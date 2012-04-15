@@ -59,7 +59,7 @@
       
     });
     var cv = this.elems.find('canvas')[0];
-    strictEqual(cv.width, 605, 'should be 470 pixels wide for 13 bars');
+    strictEqual(cv.width, 625, 'should be 470 pixels wide for 13 bars');
   });
 
 }(jQuery));

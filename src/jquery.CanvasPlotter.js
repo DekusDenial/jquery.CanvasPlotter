@@ -52,10 +52,11 @@ if ( typeof Object.create !== 'function' ) {
       this.$cv = this.$el.append('<canvas>').find('canvas');
       
       this.$cv[0].height = this.config.canvasHeight;
-      this.$cv[0].width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
+      this.$cv[0].width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap * 2;
       if (!(this.cvContext = this.$cv[0].getContext('2d'))) {
         throw "Sorry, something wrong with canvas in your browser!";
       }
+
       this.normalizeData();
       this.drawLabels();
       (this.config.animated) ? this.animatedPlotBars() : this.plotBars();
@@ -63,20 +64,50 @@ if ( typeof Object.create !== 'function' ) {
 
     normalizeData : function() {
       // scale and normalize values to be used in the plotter
-      this.maxValue = Math.max.apply(Math, this.yValue);
-      this.minValue = Math.min.apply(Math, this.yValue) - Math.round(this.maxValue/10);
+      this.maxValue = Math.round(Math.max.apply(Math, this.yValue) * (1 + this.config.constants.scaleFactor));
+      this.minValue = Math.min.apply(Math, this.yValue) - Math.round(this.maxValue * this.config.constants.scaleFactor);
     },
 
     drawLabels : function() {
+
+      var ctx = this.cvContext;
+      ctx.save();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, 0, this.$cv[0].width, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
+      ctx.restore();
+
       // draw out XLabel and YLabel
-      // first draw x-axis
-      var i, l = this.xValue.length, ctx = this.cvContext;
+     
+      var i, l = this.xValue.length;
       ctx.save();
       ctx.font = "11px Helvetica, Arial, sans-serif";
       ctx.fillStyle = "#000000";
-      for(i = 0; i < l ; i++) {
-        ctx.fillText(this.xValue[i], this.utils.posX.call(this, i), this.config.constants.maxHeight + this.config.constants.xLabelOffset);
+      // first draw x-axis
+      for (i = 0; i < l ; i++) {
+        ctx.fillText(this.xValue[i], this.utils.posX.call(this, i), this.config.constants.maxHeight + this.config.constants.bottomOffset);
       }
+
+      // then draw ticks on y-axis according to numYTicks
+      for (i = 0, l = this.config.numYTicks; i < l + 1; i++){
+        var yTickValue = Math.round(this.maxValue / this.config.numYTicks * i);
+        var yTickAdjust = (this.maxValue.toString().length - yTickValue.toString().length) * this.config.constants.yTickAdjustFactor;
+        ctx.fillText(yTickValue, this.config.constants.xTickOffset + yTickAdjust, this.utils.posY.call(this, yTickValue) + this.config.constants.yTickOffset);
+        this.drawGrids(ctx, this.config.constants.xTickOffset, this.utils.posY.call(this, yTickValue) + Math.round(this.config.constants.yTickOffset / 2));
+      }
+      
+      // then draw the bottom border of the grid
+      ctx.fillStyle = "#111";
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2), this.$cv[0].width, 1);
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, 0, 1, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
+      ctx.restore();
+
+    },
+
+    drawGrids : function(ctx, x, y){
+      // draw the grids
+      ctx.save();
+      ctx.fillStyle = "#ccc";
+      ctx.fillRect(x + 20, y, this.$cv[0].width, 1);
       ctx.restore();
     },
 
@@ -92,12 +123,12 @@ if ( typeof Object.create !== 'function' ) {
     utils : {
       posX : function(index){
         // calculate which x position to plot each bar
-        return (index * this.config.barWidth) + ((index + 1) * this.config.barGap);
+        return (index * this.config.barWidth) + ((index + 2) * this.config.barGap) + this.config.constants.xTickOffset;
       },
 
       posY : function(value){
         // calculate the top y position of each bar
-        return this.config.constants.maxHeight - this.scale(value);
+        return this.config.constants.maxHeight - this.utils.scale.call(this, value);
       },
 
       scale : function(value){
@@ -126,12 +157,15 @@ if ( typeof Object.create !== 'function' ) {
     barGap : 20,
     barWidth : 25,
     canvasHeight : 200,
+    numYTicks : 10,
     constants : {
       bottomOffset : 20,
       xLabelOffset : 15,
-      yTickOffset : 3,
-      xTickOffset : 3,
+      yTickOffset : 10,
+      yTickAdjustFactor: 6,
+      xTickOffset : 5,
       scaleFactor : 0.1
+
     }
   };
 
