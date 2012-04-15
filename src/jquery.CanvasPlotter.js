@@ -75,7 +75,6 @@ if ( typeof Object.create !== 'function' ) {
       ctx.font = "11px Helvetica, Arial, sans-serif";
       ctx.fillStyle = "#000000";
       for(i = 0; i < l ; i++) {
-        console.log(this.utils.posX.call(this, i));
         ctx.fillText(this.xValue[i], this.utils.posX.call(this, i), this.config.constants.maxHeight + this.config.constants.xLabelOffset);
       }
       ctx.restore();
