@@ -37,8 +37,8 @@ if ( typeof Object.create !== 'function' ) {
       this.yValue = [];
       var me = this;
       var $dataSource = $(this.config.dataSource), $th = $dataSource.find('th');
-      this.XLabel = $th[0];
-      this.YLabel = $th[1];
+      this.xLabel = $th[0];
+      this.yLabel = $th[1];
 
       $dataSource.find('tr td').each(function(i, el){
         (i & 1) ? me.yValue.push(el.innerText) : me.xValue.push(el.innerText);
@@ -50,17 +50,18 @@ if ( typeof Object.create !== 'function' ) {
     prepareCanvas : function(){
       // preset the canvas or adjust according to config
       this.$cv = this.$el.append('<canvas>').find('canvas');
-      if (this.config.animated) {
-        this.$cv.addClass('bar-animated');
-      }
-
+      
       this.$cv[0].height = this.config.canvasHeight;
       this.$cv[0].width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
-
+      this.normalizeData();
+      this.drawLabels();
+      (this.config.animated) ? this.animatedPlotBars() : this.plotBars();
     },
 
     normalizeData : function() {
       // scale and normalize values to be used in the plotter
+      this.maxValue = Math.max.apply(Math, this.yValue);
+      this.minValue = Math.min.apply(Math, this.yValue) - Math.round(this.maxValue/10);
     },
 
     drawLabels : function() {
@@ -73,17 +74,24 @@ if ( typeof Object.create !== 'function' ) {
 
     animatedPlotBars : function(){
       // plot bars with animation
+      this.$cv.addClass('bar-animated');
     },
 
     utils : {
       posX : function(index){
         // calculate which x position to plot each bar
+        return (index * barWidth) + ((index + 1) * barGap);
       },
 
-      posY : function(index){
+      posY : function(value){
         // calculate the top y position of each bar
-      }
+        return maxHeight - this.scale(value);
+      },
 
+      scale : function(value){
+        // calculate the relative height of the bar according to maxValue
+        return Math.round((value/maxValue) * maxHeight);
+      }
     }
   };
 
@@ -95,19 +103,25 @@ if ( typeof Object.create !== 'function' ) {
     });
   };
 
+  // default settings here:
+  // barGap = how much space between each plotted bar
+  // barWidth = how wide is each bar
+  // canvasHeight = how long the canvas should be
+  // dataSource = the source of the data
   $.fn.canvasPlotter.defaults = {
-    // default settings here:
-    // barGap = how much space between each plotted bar
-    // barWidth = how wide is each bar
-    // canvasHeight = how long the canvas should be
-    // dataSource = the source of the data
     animated : false,
     dataSource: 'table#dataSource',
     barGap : 15,
     barWidth : 20,
-    canvasHeight : 200
-
-    // and more ...
+    canvasHeight : 200,
+    constants : {
+      bottomOffset : 20,
+      yLabelOffset : 3,
+      xLabelOffset : 3,
+      scaleFactor : 0.1
+    }
   };
+
+  $.fn.canvasPlotter.defaults.constants.maxHeight = $.fn.canvasPlotter.defaults.canvasHeight - $.fn.canvasPlotter.defaults.constants.bottomOffset;
 
 }(jQuery, window, document));

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8">
+  <title>jQuery Canvas Plotter Demo</title>
+</head>
+<body>
+  <table width="200" border="0" id="dataSource">
+    <tr>
+      <th>Year</th>
+      <th>Profit</th>
+    </tr>
+    <tr>
+      <td>2009</td>
+      <td>100</td>
+    </tr>
+    <tr>
+      <td>2008</td>
+      <td>132</td>
+    </tr>
+    <tr>
+      <td>2007</td>
+      <td>112</td>
+    </tr>
+    <tr>
+      <td>2006</td>
+      <td>145</td>
+    </tr>
+    <tr>
+      <td>2005</td>
+      <td>154</td>
+    </tr>
+    <tr>
+      <td>2004</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <td>2003</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <td>2002</td>
+      <td>143</td>
+    </tr>
+    <tr>
+      <td>2001</td>
+      <td>165</td>
+    </tr>
+    <tr>
+      <td>2000</td>
+      <td>135</td>
+    </tr>
+    <tr>
+      <td>1999</td>
+      <td>110</td>
+    </tr>
+    <tr>
+      <td>1998</td>
+      <td>180</td>
+    </tr>
+    <tr>
+      <td>1997</td>
+      <td>105</td>
+    </tr>
+  </table>
+
+  <div id="plot"></div>
+
+  <script src="../libs/jquery/jquery.js"></script>
+  <script src="../src/jquery.CanvasPlotter.js"></script>
+  <script>
+
+  (function(){
+    console.log('here we start');
+    $('div#plot').canvasPlotter({
+      animated : true
+    });
+  }());
+
+  </script>
+</body>
+</html>
