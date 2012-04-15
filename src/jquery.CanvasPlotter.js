@@ -53,6 +53,9 @@ if ( typeof Object.create !== 'function' ) {
       
       this.$cv[0].height = this.config.canvasHeight;
       this.$cv[0].width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
+      if (!(this.cvContext = this.$cv[0].getContext('2d'))) {
+        throw "Sorry, something wrong with canvas in your browser!";
+      }
       this.normalizeData();
       this.drawLabels();
       (this.config.animated) ? this.animatedPlotBars() : this.plotBars();
@@ -66,6 +69,16 @@ if ( typeof Object.create !== 'function' ) {
 
     drawLabels : function() {
       // draw out XLabel and YLabel
+      // first draw x-axis
+      var i, l = this.xValue.length, ctx = this.cvContext;
+      ctx.save();
+      ctx.font = "11px Helvetica, Arial, sans-serif";
+      ctx.fillStyle = "#000000";
+      for(i = 0; i < l ; i++) {
+        console.log(this.utils.posX.call(this, i));
+        ctx.fillText(this.xValue[i], this.utils.posX.call(this, i), this.config.constants.maxHeight + this.config.constants.xLabelOffset);
+      }
+      ctx.restore();
     },
 
     plotBars : function(){
@@ -80,12 +93,12 @@ if ( typeof Object.create !== 'function' ) {
     utils : {
       posX : function(index){
         // calculate which x position to plot each bar
-        return (index * barWidth) + ((index + 1) * barGap);
+        return (index * this.config.barWidth) + ((index + 1) * this.config.barGap);
       },
 
       posY : function(value){
         // calculate the top y position of each bar
-        return maxHeight - this.scale(value);
+        return this.config.constants.maxHeight - this.scale(value);
       },
 
       scale : function(value){
@@ -111,13 +124,14 @@ if ( typeof Object.create !== 'function' ) {
   $.fn.canvasPlotter.defaults = {
     animated : false,
     dataSource: 'table#dataSource',
-    barGap : 15,
-    barWidth : 20,
+    barGap : 20,
+    barWidth : 25,
     canvasHeight : 200,
     constants : {
       bottomOffset : 20,
-      yLabelOffset : 3,
-      xLabelOffset : 3,
+      xLabelOffset : 15,
+      yTickOffset : 3,
+      xTickOffset : 3,
       scaleFactor : 0.1
     }
   };
