@@ -1,28 +1,6 @@
-/*! jQuery Canvasplotter - v0.1.0 - 2012-04-14
+/*! jQuery Canvasplotter - v0.1.0 - 2012-04-15
 * https://github.com/DekusDenial/jquery.CanvasPlotter
 * Copyright (c) 2012 DekusDenial; Licensed MIT */
-
-// (function($) {
-
-//   // Collection method.
-//   $.fn.awesome = function() {
-//     return this.each(function() {
-//       $(this).html('awesome');
-//     });
-//   };
-
-//   // Static method.
-//   $.awesome = function() {
-//     return 'awesome';
-//   };
-
-//   // Custom selector.
-//   $.expr[':'].awesome = function(elem) {
-//     return elem.textContent.indexOf('awesome') >= 0;
-//   };
-
-// }(jQuery));
-
 
 if ( typeof Object.create !== 'function' ) {
   Object.create = function(o) {
@@ -43,30 +21,59 @@ if ( typeof Object.create !== 'function' ) {
       this.$el = $(el);
 
       this.config = $.extend( {}, $.fn.canvasPlotter.defaults, opts );
+      this.dataSource = this.$el.data('source') || this.config.dataSource;
+      this.dataSource = (this.dataSource.indexOf('#') > -1) ? this.dataSource : ('#' + this.dataSource);
+      this.fetchData();
+    },
+
+    fetchData : function() {
+      // read input data
+      // 1) assume we have a table selector passed in
+      this.xValue = [];
+      this.yValue = [];
+      var me = this;
+      var $dataSource = $(this.config.dataSource), $th = $dataSource.find('th');
+      this.xLabel = $th[0];
+      this.yLabel = $th[1];
+
+      $dataSource.find('tr td').each(function(i, el){
+        (i & 1) ? me.yValue.push(el.innerText) : me.xValue.push(el.innerText);
+      });
       this.prepareCanvas();
+
     },
 
     prepareCanvas : function(){
       // preset the canvas or adjust according to config
-      var $cv = $('<canvas>');
-      if (this.config.animated) {
-        $cv.addClass('bar-animated');
+      this.$cv = this.$el.append('<canvas>').find('canvas');
+      
+      this.$cv[0].height = this.config.canvasHeight;
+      this.$cv[0].width = this.yValue.length * (this.config.barWidth + this.config.barGap) + this.config.barGap;
+      if (!(this.cvContext = this.$cv[0].getContext('2d'))) {
+        throw "Sorry, something wrong with canvas in your browser!";
       }
-
-      this.$el.append($cv);
-
-    },
-
-    fetchData : function() {
-      // read input data, or fetch by AJAX
+      this.normalizeData();
+      this.drawLabels();
+      (this.config.animated) ? this.animatedPlotBars() : this.plotBars();
     },
 
     normalizeData : function() {
       // scale and normalize values to be used in the plotter
+      this.maxValue = Math.max.apply(Math, this.yValue);
+      this.minValue = Math.min.apply(Math, this.yValue) - Math.round(this.maxValue/10);
     },
 
     drawLabels : function() {
-      // draw out XLabels and YLabels
+      // draw out XLabel and YLabel
+      // first draw x-axis
+      var i, l = this.xValue.length, ctx = this.cvContext;
+      ctx.save();
+      ctx.font = "11px Helvetica, Arial, sans-serif";
+      ctx.fillStyle = "#000000";
+      for(i = 0; i < l ; i++) {
+        ctx.fillText(this.xValue[i], this.utils.posX.call(this, i), this.config.constants.maxHeight + this.config.constants.xLabelOffset);
+      }
+      ctx.restore();
     },
 
     plotBars : function(){
@@ -75,15 +82,23 @@ if ( typeof Object.create !== 'function' ) {
 
     animatedPlotBars : function(){
       // plot bars with animation
+      this.$cv.addClass('bar-animated');
     },
 
     utils : {
       posX : function(index){
         // calculate which x position to plot each bar
+        return (index * this.config.barWidth) + ((index + 1) * this.config.barGap);
       },
 
-      posY : function(index){
+      posY : function(value){
         // calculate the top y position of each bar
+        return this.config.constants.maxHeight - this.scale(value);
+      },
+
+      scale : function(value){
+        // calculate the relative height of the bar according to maxValue
+        return Math.round((value/this.maxValue) * this.config.constants.maxHeight);
       }
     }
   };
@@ -96,14 +111,26 @@ if ( typeof Object.create !== 'function' ) {
     });
   };
 
+  // default settings here:
+  // barGap = how much space between each plotted bar
+  // barWidth = how wide is each bar
+  // canvasHeight = how long the canvas should be
+  // dataSource = the source of the data
   $.fn.canvasPlotter.defaults = {
-    // default settings here
     animated : false,
-    barGap : 15,
-    barWidth : 20,
-    canvasHeight : 200
-
-    // and more ...
+    dataSource: 'table#dataSource',
+    barGap : 20,
+    barWidth : 25,
+    canvasHeight : 200,
+    constants : {
+      bottomOffset : 20,
+      xLabelOffset : 15,
+      yTickOffset : 3,
+      xTickOffset : 3,
+      scaleFactor : 0.1
+    }
   };
+
+  $.fn.canvasPlotter.defaults.constants.maxHeight = $.fn.canvasPlotter.defaults.canvasHeight - $.fn.canvasPlotter.defaults.constants.bottomOffset;
 
 }(jQuery, window, document));

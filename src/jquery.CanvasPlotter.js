@@ -102,7 +102,7 @@ if ( typeof Object.create !== 'function' ) {
 
       scale : function(value){
         // calculate the relative height of the bar according to maxValue
-        return Math.round((value/maxValue) * maxHeight);
+        return Math.round((value/this.maxValue) * this.config.constants.maxHeight);
       }
     }
   };
