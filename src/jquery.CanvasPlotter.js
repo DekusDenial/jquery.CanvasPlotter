@@ -66,6 +66,7 @@ if ( typeof Object.create !== 'function' ) {
       // scale and normalize values to be used in the plotter
       this.maxValue = Math.round(Math.max.apply(Math, this.yValue) * (1 + this.config.constants.scaleFactor));
       this.minValue = Math.min.apply(Math, this.yValue) - Math.round(this.maxValue * this.config.constants.scaleFactor);
+      this.$cv[0].width += this.maxValue.toString().length * 4;
     },
 
     drawLabels : function() {
@@ -73,7 +74,7 @@ if ( typeof Object.create !== 'function' ) {
 
       ctx.save();
       ctx.fillStyle = '#fff';
-      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset + this.maxValue.toString().length * 2, 0, this.$cv[0].width, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset + this.maxValue.toString().length * 4, 0, this.$cv[0].width, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
 
       // draw out XLabel and YLabel
      
@@ -101,12 +102,12 @@ if ( typeof Object.create !== 'function' ) {
       // draw the grids
       ctx.save();
       ctx.fillStyle = "#ccc";
-      ctx.fillRect(x + 20  + this.maxValue.toString().length * 2, y, this.$cv[0].width, 1);
+      ctx.fillRect(x + 20  + this.maxValue.toString().length * 4, y, this.$cv[0].width, 1);
 
       // then draw the bottom and left border of the grid
       ctx.fillStyle = "#111";
-      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset  + this.maxValue.toString().length * 2, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2), this.$cv[0].width, 1);
-      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset  + this.maxValue.toString().length * 2, 0, 1, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset  + this.maxValue.toString().length * 4, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2), this.$cv[0].width, 1);
+      ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset  + this.maxValue.toString().length * 4, 0, 1, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
       ctx.restore();
     },
 
@@ -148,7 +149,7 @@ if ( typeof Object.create !== 'function' ) {
     utils : {
       posX : function(index){
         // calculate which x position to plot each bar
-        return (index * this.config.barWidth) + ((index + 2) * this.config.barGap) + this.config.constants.xTickOffset;
+        return (index * this.config.barWidth) + ((index + 2) * this.config.barGap) + this.config.constants.xTickOffset + this.maxValue.toString().length * 4;
       },
 
       posY : function(value){
