@@ -112,14 +112,6 @@ if ( typeof Object.create !== 'function' ) {
 
     plotBars : function(){
       // plot the bars
-      console.log('inside plotBars');
-    },
-
-    animatedPlotBars : function(){
-      // plot bars with animation
-      console.log('inside aniatedPlotBars');
-      this.$cv.addClass('bar-animated');
-
       var i = 0, l = this.yValue.length, ctx = this.cvContext;
       ctx.save();
       ctx.lineWidth = 1;      
@@ -145,6 +137,12 @@ if ( typeof Object.create !== 'function' ) {
       }
 
       ctx.restore();
+    },
+
+    animatedPlotBars : function(){
+      // plot bars with animation
+      this.$cv.addClass('bar-animated');
+      this.plotBars();
     },
 
     utils : {

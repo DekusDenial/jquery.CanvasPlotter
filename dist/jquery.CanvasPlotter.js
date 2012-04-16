@@ -76,14 +76,14 @@ if ( typeof Object.create !== 'function' ) {
       var i, l = this.xValue.length;
 
       ctx.font = "11px Helvetica, Arial, sans-serif";
-      ctx.fillStyle = "#000000";
+      ctx.fillStyle = "#000";
       // first draw x-axis
       for (i = 0; i < l ; i++) {
         ctx.fillText(this.xValue[i], this.utils.posX.call(this, i), this.config.constants.maxHeight + this.config.constants.bottomOffset);
       }
 
       // then draw ticks on y-axis according to numYTicks
-      for (i = 0, l = this.config.numYTicks; i < l + 1; i++){
+      for (i = 0, l = this.config.numYTicks; i < l + 1; i++) {
         var yTickValue = Math.round(this.maxValue / this.config.numYTicks * i);
         var yTickAdjust = (this.maxValue.toString().length - yTickValue.toString().length) * this.config.constants.yTickAdjustFactor;
         ctx.fillText(yTickValue, this.config.constants.xTickOffset + yTickAdjust, this.utils.posY.call(this, yTickValue) + this.config.constants.yTickOffset);
@@ -99,7 +99,7 @@ if ( typeof Object.create !== 'function' ) {
       ctx.fillStyle = "#ccc";
       ctx.fillRect(x + 20, y, this.$cv[0].width, 1);
 
-      // then draw the bottom border of the grid
+      // then draw the bottom and left border of the grid
       ctx.fillStyle = "#111";
       ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2), this.$cv[0].width, 1);
       ctx.fillRect(this.config.barGap + this.config.constants.xTickOffset, 0, 1, this.config.constants.maxHeight + Math.round(this.config.constants.yTickOffset / 2));
@@ -108,11 +108,37 @@ if ( typeof Object.create !== 'function' ) {
 
     plotBars : function(){
       // plot the bars
+      var i = 0, l = this.yValue.length, ctx = this.cvContext;
+      ctx.save();
+      ctx.lineWidth = 1;      
+
+      for (; i < l; i++){
+        // fake the shadow without using canvas context shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.5)';
+        ctx.fillRect(this.utils.posX.call(this, i) + 3, this.utils.posY.call(this, this.yValue[i]) + Math.round(this.config.constants.yTickOffset / 2) + 3, this.config.barWidth, this.utils.scale.call(this, this.yValue[i]) - 3);
+
+        // draw the actual bar on top of the "shadow"
+        ctx.fillStyle = '#8DC900';
+        ctx.fillRect(this.utils.posX.call(this, i), this.utils.posY.call(this, this.yValue[i]) + Math.round(this.config.constants.yTickOffset / 2), this.config.barWidth , this.utils.scale.call(this, this.yValue[i]));
+
+        // show the bar value
+        ctx.fillStyle = '#000';
+        var yValueAdjust = Math.round(this.config.barWidth / 2 - (this.yValue[i].toString().length * this.config.constants.yTickAdjustFactor / 2));
+        ctx.fillText(this.yValue[i], this.utils.posX.call(this, i) + yValueAdjust, this.utils.posY.call(this, this.yValue[i]));
+
+
+        // extra outline stroke for the bar
+        // ctx.strokeStyle = '#444';
+        // ctx.strokeRect(this.utils.posX.call(this, i), this.utils.posY.call(this, this.yValue[i]) + Math.round(this.config.constants.yTickOffset / 2), this.config.barWidth , this.utils.scale.call(this, this.yValue[i]));
+      }
+
+      ctx.restore();
     },
 
     animatedPlotBars : function(){
       // plot bars with animation
       this.$cv.addClass('bar-animated');
+      this.plotBars();
     },
 
     utils : {
